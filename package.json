@@ -1,0 +1,32 @@
+{
+  "name": "stsapp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@syncfusion/ej2-icons": "^28.1.33",
+    "@syncfusion/ej2-vue-buttons": "^28.1.37",
+    "@syncfusion/ej2-vue-dropdowns": "^28.1.38",
+    "@syncfusion/ej2-vue-grids": "^28.1.38",
+    "@syncfusion/ej2-vue-inputs": "^28.1.37",
+    "@syncfusion/ej2-vue-layouts": "^28.1.33",
+    "@syncfusion/ej2-vue-navigations": "^28.1.37",
+    "@syncfusion/ej2-vue-notifications": "^28.1.33",
+    "@syncfusion/ej2-vue-popups": "^28.1.38",
+    "@syncfusion/ej2-vue-schedule": "^28.1.38",
+    "@syncfusion/ej2-vue-splitbuttons": "^28.1.37",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "eslint": "^9.19.0",
+    "vite": "^6.0.5"
+  }
+}

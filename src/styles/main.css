@@ -1,0 +1,15 @@
+body {
+    color:white;
+}
+
+.avatar-default .sample_container .avatar-block {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.avatar-default .e-avatar.image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 2px;
+}
