@@ -10,5 +10,5 @@ enableRipple(true);
 //DebugUrl https://localhost:7260/api/ ProdUrl https://api.sts-finanzen.de/api/
 const app = createApp(App)
 app.config.globalProperties.$version = "1.0.0.0"
-app.config.globalProperties.$serviceBaseUrl = "https://api.sts-finanzen.de/api/"
+app.config.globalProperties.$serviceBaseUrl = "https://localhost:7260/api/"
 app.use(store).use(router).mount("#app");

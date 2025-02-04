@@ -5,7 +5,6 @@
                 <div class="col-md-12">
                     <ejs-appbar :colorMode=appBarColor>
                         <ejs-button cssClass="e-inherit menu" iconCss="e-icons e-menu" :created="onCreate"></ejs-button>
-                        <ejs-button cssClass="e-inherit home e-appbar-menu">Dashboard</ejs-button>
                         <ejs-dropdownbutton :select="onSelect" :cssClass="'e-inherit e-appbar-menu ' + appBarColor.colorClass" :items="customerDataItems">Ihre Daten</ejs-dropdownbutton>
                         <ejs-dropdownbutton :select="onSelect" :cssClass="'e-inherit e-appbar-menu ' + appBarColor.colorClass" :items="documentItems">Dokumente</ejs-dropdownbutton>
                         <ejs-dropdownbutton :select="onSelect" :cssClass="'e-inherit e-appbar-menu ' + appBarColor.colorClass" :items="mediaItems">Medien</ejs-dropdownbutton>
@@ -20,7 +19,7 @@
                         <div class="e-appbar-separator"></div>
                         <ejs-tooltip ref="tooltip" position="Bottom Center" :content="userInformation">
                             <ejs-dropdownbutton :items="profileItems" class="e-custom" :select='onSelect'>
-                                <div class="e-avatar e-avatar-small e-avatar-circle"><img :src="userInitial" /></div>
+                                <div class="e-avatar e-avatar-small e-avatar-circle"><img v-bind:src="userInitial" /></div>
                                 <span class="e-badge e-badge-primary e-badge-circle">{{messageCount}}</span>
                             </ejs-dropdownbutton>
                         </ejs-tooltip>
@@ -159,6 +158,7 @@
             try {
                 this.userInitial = localStorage.getItem('initial') ? localStorage.getItem('initial') : this.generateAvatar(localStorage.getItem('firstname').charAt(0) + localStorage.getItem('lastname').charAt(0));
                 this.userInformation = localStorage.getItem('firstname') + ' ' + localStorage.getItem('lastname') + '<br/>' + localStorage.getItem('email') + '<br/>E-Mailadresse ist ' + (localStorage.getItem('confirmed') ? '' : 'nicht ') + 'bestätigt.';
+                localStorage.setItem('initial', this.userInitial);
             } catch {
                 this.userInitial = 'Please log in';
             }

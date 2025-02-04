@@ -11,7 +11,7 @@
                     <!-- Initialize Uploader -->
                     <div id="dropArea" class="uploader-image-preview-drop-area" style="height: auto; overflow: hidden">
                         <div>Avatar</div>
-                        <span class="text-middle">Aktuelles Bild</span><div class="e-avatar e-avatar-normal e-avatar-circle"><img :src="avatar" /></div>
+                        <span class="text-middle">Aktuelles Bild</span><div class="e-avatar e-avatar-normal e-avatar-circle"><img v-bind:src="userData.avatar" /></div>
                         <ejs-uploader id='imagePreview' name="UploadFiles" :asyncSettings="path" ref="uploadObj" :allowedExtensions='extensions'
                                       :dropArea="dropElement" :selected="onFileSelect" :buttons="buttons"
                                       cssClass='uploader-preview'>
@@ -22,13 +22,17 @@
         </div>
         <div class="e-card-content center">
             <div>
-                <ejs-textbox floatLabelType="Auto" placeholder="Vorname" v-model="firstname"></ejs-textbox>
-                <ejs-textbox floatLabelType="Auto" placeholder="Nachname" v-model="lastname"></ejs-textbox>
+                <ejs-textbox floatLabelType="Auto" placeholder="Vorname" v-model="userData.firstname"></ejs-textbox>
+                <ejs-textbox floatLabelType="Auto" placeholder="Nachname" v-model="userData.lastname"></ejs-textbox>
+            </div>
+            <div>
+                <p></p>
+                <ejs-switch v-model="userData.consentDataProcessing"></ejs-switch><span> Ich stimme der Vertragsgemäßen Verarbeitung meiner Daten zu.</span>
             </div>
             <div>
                 <p>Sicherheitsfrage für die Password-Wiederherstellung:</p>
                 <ejs-dropdownlist id='secureQuestionid' :dataSource='secureQuestions' :value="selectedQuestion" placeholder='Sicherheitsfrage'></ejs-dropdownlist>
-                <ejs-textbox ref="pwd" :htmlAttributes="htmlAttributes" floatLabelType="Auto" placeholder="Antwort" v-model="secureAnswer"></ejs-textbox>
+                <ejs-textbox ref="pwd" :htmlAttributes="htmlAttributes" floatLabelType="Auto" placeholder="Antwort" v-model="securityAnswer"></ejs-textbox>
                 <span v-if="showpw" class="e-icons e-eye eyeclass" v-on:click="showpw = !showpw"></span>
                 <span v-if="!showpw" class="e-icons e-eye-slash eyeclass" v-on:click="showpw = !showpw"></span>
             </div>
@@ -51,12 +55,11 @@
 
 <script>
     import { TextBoxComponent } from "@syncfusion/ej2-vue-inputs";
-    import { ButtonComponent } from "@syncfusion/ej2-vue-buttons";
+    import { ButtonComponent, SwitchComponent } from "@syncfusion/ej2-vue-buttons";
     import { MessageComponent } from '@syncfusion/ej2-vue-notifications';
     import { DropDownListComponent } from "@syncfusion/ej2-vue-dropdowns";
     import { UploaderComponent } from '@syncfusion/ej2-vue-inputs';
     import { createElement, isNullOrUndefined } from '@syncfusion/ej2-base';
-
 
     export default {
         components: {
@@ -64,11 +67,11 @@
             'ejs-button': ButtonComponent,
             'ejs-message': MessageComponent,
             'ejs-dropdownlist': DropDownListComponent,
-            'ejs-uploader': UploaderComponent
+            'ejs-uploader': UploaderComponent,
+            'ejs-switch': SwitchComponent
         },
         data() {
             return {
-                avatar: localStorage.getItem('initial'),
                 buttons: { browse: "Datei wählen", clear: "Alle löschen", upload: "" },
                 token: localStorage.getItem("token"),
                 isSequential: false,
@@ -79,10 +82,10 @@
                 filesDetails: [],
                 parentElement: '',
                 progressbarContainer: '',
-                firstname: localStorage.getItem('firstname'),
-                lastname: localStorage.getItem('lastname'),
-                secureAnswer: localStorage.getItem('securityAnswer').substring(2),
-                secureQuestion: parseInt(localStorage.getItem('securityAnswer').charAt(0) - 1),
+                firstname: '',
+                lastname: '',
+                securityAnswer: '',
+                secureQuestion: 0,
                 showpw: true,
                 pwtype: 'password',
                 htmlAttributes: '',
@@ -90,7 +93,8 @@
                 success: false,
                 regError: false,
                 selectedQuestion: null,
-                secureQuestions: []
+                secureQuestions: [],
+                userData: { "firstname": "", "lastname": "", "securityAnswer": "", "avatar": "" }
             }
         },
         created: function () {
@@ -98,7 +102,7 @@
             this.getSecureQuestions().then(() => { this.selectedQuestion = this.secureQuestions[this.secureQuestion] })
         },
         watch: {
-            secureAnswer: function (value) {
+            securityAnswer: function (value) {
                 this.noregister = false
                 if (value && this.lastname && this.confirmcode && this.firstname) {
                     this.noregister = true
@@ -106,19 +110,19 @@
             },
             firstname: function (value) {
                 this.noregister = false
-                if (value && this.lastname && this.confirmcode && this.secureAnswer) {
+                if (value && this.lastname && this.confirmcode && this.securityAnswer) {
                     this.noregister = true
                 }
             },
             lastname: function (value) {
                 this.noregister = false
-                if (value && this.secureAnswer && this.confirmcode && this.firstname) {
+                if (value && this.securityAnswer && this.confirmcode && this.firstname) {
                     this.noregister = true
                 }
             },
             confirmcode: function (value) {
                 this.noregister = false
-                if (value && this.lastname && this.secureAnswer && this.firstname) {
+                if (value && this.lastname && this.securityAnswer && this.firstname) {
                     this.noregister = true
                 }
             },
@@ -129,7 +133,7 @@
         mounted() {
             this.error = false;
             this.showpw = false;
-
+            this.userData.avatar = localStorage.getItem('initial');
         },
         methods: {
             async getSecureQuestions() {
@@ -159,14 +163,22 @@
                         this.showError('Unterstützungsdienste sind nicht erreichbar oder login fehlerhaft. ' + err)
                         this.noregister = false
                     }).then(() => {
-                    //    fetch(this.$serviceBaseUrl + 'Account/GetUserInfo', requestOptions)
-                    //        .then(async respInfo => {
-                    //            var userinfo = await respInfo.json();
-                    //            var avatar = 'data:image/jpeg;base64,' + userinfo.avatar
-                    //            localStorage.setItem('initial', avatar );
-                    //            var image = document.getElementById("imagePreview");
-                    //            image.src = avatar;
-                    //    })
+                        fetch(this.$serviceBaseUrl + 'Account/UserInformation', requestOptions)
+                            .then(async respInfo => {
+                                this.userData = await respInfo.json();
+
+                                if (!this.userData.avatar)
+                                    this.userData.avatar = localStorage.getItem('initial');
+
+                                if (this.userData.securityAnswer.substring(2, 1) == "-") {
+                                    this.securityAnswer = this.userData.securityAnswer.substring(2);
+                                    this.secureQuestion = parseInt(this.userData.securityAnswer.charAt(0) - 1);
+                                }
+                                else {
+                                    this.secureQuestion = 0;
+                                    this.securityAnswer = this.userData.securityAnswer;
+                                }
+                            })
                     })
             },
             showError(err) {
@@ -174,9 +186,15 @@
                 this.errorMsg = err
             },
             async saveProfile() {
+
+                if (!this.secureQuestion)
+                    this.secureQuestion = 1;
+
                 this.regError = false
                 this.success = false
                 this.error = false
+                this.userData.securityAnswer = this.secureQuestion.toString() + "-" + this.securityAnswer;
+                localStorage.setItem('consentDataProcessing', this.userData.consentDataProcessing)
                 const requestOptions = {
                     method: 'POST',
                     headers: {
@@ -185,21 +203,17 @@
                         'content-type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ confirmcode: this.confirmcode, firstname: this.firstname, lastname: this.lastname, securityanswer: this.securityanswer })
+                    body: JSON.stringify(this.userData)
                 }
 
-                await fetch(this.$serviceBaseUrl + 'Account/Confirm', requestOptions)
+                await fetch(this.$serviceBaseUrl + 'Account/SaveProfile', requestOptions)
                     .then(async resp => {
                         await resp.json()
-                        if (!resp.ok) {
-                            this.alreadyReg = true
-                            this.noregister = false
-                        }
-                        this.success = !this.alreadyReg
+                        this.success = resp.ok;
+                        this.$router.push('/');
                     })
                     .catch((err) => {
                         this.showError('Unterstützungsdienste sind nicht erreichbar oder login fehlerhaft. ' + err)
-                        this.noregister = false
                     })
             },
             cancel() {
@@ -250,14 +264,16 @@
                 let preview = li.querySelector('.upload-image');
                 let file = args.rawFile;
                 let reader = new FileReader();
+                var selv = this;
                 reader.addEventListener('load', function () {
                     preview.src = reader.result;
                     localStorage.setItem('initial', preview.src);
+                    selv.userData.avatar = preview.src;
                 }, false);
                 if (file) {
                     reader.readAsDataURL(file);
                 }
-            }
+            },
         }
     }
 </script>
@@ -311,6 +327,7 @@
         position: relative;
         top: -22px;
     }
+
     .e-upload {
         width: 99%
     }
