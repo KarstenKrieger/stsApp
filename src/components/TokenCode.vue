@@ -105,6 +105,8 @@
                                     localStorage.setItem('email', data.email)
                                     localStorage.setItem('confirmed', data.confirmed)
                                     localStorage.setItem('securityAnswer', data.securityAnswer)
+                                    localStorage.setItem('initial', data.avatar)
+                                    localStorage.setItem('consentDataProcessing', data.consentDataProcessing)
                                 }
                             })
                         hideSpinner(document.getElementById('container'));
